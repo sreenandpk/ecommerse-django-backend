@@ -38,28 +38,19 @@ class LoginSerializer(serializers.Serializer):
         email = attrs.get("email")
         password = attrs.get("password")
 
-        # Check if user exists and password is correct first
-        try:
-            existing_user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            existing_user = None
-
-        if existing_user and existing_user.check_password(password):
-            if not existing_user.is_active:
-                 raise serializers.ValidationError(
-                    {"detail": "User account is disabled"}
-                )
-
-        user = authenticate(email=email, password=password)
+        user = authenticate(username=email, password=password)
+        
         if not user:
+            # Check if user exists but is inactive to provide better error
+            try:
+                existing_user = User.objects.get(email__iexact=email)
+                if not existing_user.is_active:
+                    raise serializers.ValidationError({"detail": "User account is disabled"})
+            except User.DoesNotExist:
+                pass
+                
             raise serializers.ValidationError(
                 {"detail": "Invalid email or password"}
-            )
-
-        # Double check (redundant but safe)
-        if not user.is_active:
-            raise serializers.ValidationError(
-                {"detail": "User account is disabled"}
             )
 
         attrs["user"] = user

@@ -19,6 +19,7 @@ DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "13.53.193.159",  # ✅ AWS Backend IP
 ]
 
 
@@ -28,6 +29,7 @@ ALLOWED_HOSTS = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
+    "http://13.53.193.159", # ✅ For testing directly via IP if needed
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -35,6 +37,7 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
+    "http://13.53.193.159",
 ]
 
 # REQUIRED for JWT refresh cookie
@@ -189,10 +192,10 @@ SIMPLE_JWT = {
 # 🔐 Refresh token stored in cookie
 SIMPLE_JWT.update({
     "AUTH_COOKIE": "refresh",
-    "AUTH_COOKIE_SECURE": False,      # localhost ONLY
+    "AUTH_COOKIE_SECURE": not DEBUG,      # True in production (HTTPS)
     "AUTH_COOKIE_HTTP_ONLY": True,
     "AUTH_COOKIE_PATH": "/",
-    "AUTH_COOKIE_SAMESITE": "Lax",
+    "AUTH_COOKIE_SAMESITE": "Lax",        # Lax is safer for cross-site if not using HTTPS + None
 })
 
 # =====================
