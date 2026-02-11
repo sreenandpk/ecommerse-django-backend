@@ -97,7 +97,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
         source="recently_viewed"
     )
 
-    image = serializers.SerializerMethodField()
+    image = serializers.ImageField(required=False, allow_null=True)
+    password = serializers.CharField(
+        write_only=True,
+        required=False,
+        validators=[validate_password]
+    )
 
     class Meta:
         model = User
@@ -106,6 +111,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "email",
             "name",
             "image",
+            "password",
             "created_at",
             "is_staff",
             "recently_viewed",
@@ -113,7 +119,22 @@ class UserProfileSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ("id", "created_at", "is_staff")
 
+    def validate_email(self, value):
+        user = self.instance
+        if User.objects.exclude(id=user.id).filter(email__iexact=value).exists():
+            raise serializers.ValidationError("This email is already in use.")
+        return value.lower().strip()
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop("password", None)
+        if password:
+            instance.set_password(password)
+        
+        return super().update(instance, validated_data)
+
     def get_image(self, obj):
+        # Fallback for representation if needed, but DRF ImageField 
+        # usually handles absolute URLs if request is in context.
         request = self.context.get("request")
         if obj.image and request:
             return request.build_absolute_uri(obj.image.url)
