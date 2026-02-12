@@ -39,11 +39,15 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "https://ecommerce-django-frontend-lhvj.vercel.app",
     "https://icecreams.duckdns.org",
+    "http://localhost:5173",
+    "http://localhost:5174",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://ecommerce-django-frontend-lhvj.vercel.app",
     "https://icecreams.duckdns.org",
+    "http://localhost:5173",
+    "http://localhost:5174",
 ]
 
 CSRF_COOKIE_SECURE = True
