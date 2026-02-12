@@ -19,33 +19,35 @@ DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "13.53.193.159",  # ✅ AWS Backend IP
-    ".amazonaws.com",  # Allow AWS domains
+    "13.53.193.159",
+    "icecreams.duckdns.org",
+    ".amazonaws.com",
 ]
 
-# ✅ REQUIRED for absolute URLs behind a proxy (AWS)
+# Required behind proxy (NGINX on EC2)
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# =====================
+# CORS / CSRF
+# =====================
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_CREDENTIALS = True
 
-# =====================
-# CORS / CSRF (CRITICAL)
-# =====================
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
-    "http://13.53.193.159", # ✅ For testing directly via IP if needed
+    "http://13.53.193.159",
+    "http://icecreams.duckdns.org",
 ]
-
-CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://13.53.193.159",
+    "http://icecreams.duckdns.org",
 ]
 
-# REQUIRED for JWT refresh cookie
 CORS_ALLOW_HEADERS = [
     "authorization",
     "content-type",
@@ -60,6 +62,12 @@ CORS_ALLOW_METHODS = [
     "DELETE",
     "OPTIONS",
 ]
+
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = "Lax"
+
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
 
 # =====================
 # AUTH
@@ -113,6 +121,7 @@ MIDDLEWARE = [
 # URLS / TEMPLATES
 # =====================
 ROOT_URLCONF = "config.urls"
+WSGI_APPLICATION = "config.wsgi.application"
 
 TEMPLATES = [
     {
@@ -129,10 +138,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "config.wsgi.application"
-
 # =====================
-# DATABASE (POSTGRES)
+# DATABASE (Postgres)
 # =====================
 DATABASES = {
     "default": {
@@ -156,7 +163,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # =====================
-# I18N
+# INTERNATIONALIZATION
 # =====================
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
@@ -173,7 +180,7 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # =====================
-# DRF + JWT (FINAL & CORRECT)
+# DRF
 # =====================
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -186,6 +193,9 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
+# =====================
+# JWT
+# =====================
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
@@ -194,13 +204,12 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-# 🔐 Refresh token stored in cookie
 SIMPLE_JWT.update({
     "AUTH_COOKIE": "refresh",
-    "AUTH_COOKIE_SECURE": not DEBUG,      # True in production (HTTPS)
+    "AUTH_COOKIE_SECURE": False,  # Will change to True after HTTPS
     "AUTH_COOKIE_HTTP_ONLY": True,
     "AUTH_COOKIE_PATH": "/",
-    "AUTH_COOKIE_SAMESITE": "Lax",        # Lax is safer for cross-site if not using HTTPS + None
+    "AUTH_COOKIE_SAMESITE": "Lax",
 })
 
 # =====================
@@ -208,3 +217,8 @@ SIMPLE_JWT.update({
 # =====================
 RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
 RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET")
+
+# =====================
+# DEFAULT PK
+# =====================
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
