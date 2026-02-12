@@ -7,6 +7,7 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # =====================
 # SECURITY
 # =====================
@@ -14,7 +15,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
     raise ValueError("SECRET_KEY is not set")
 
-DEBUG = False  # 🔥 MUST be False in production
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -24,29 +25,36 @@ ALLOWED_HOSTS = [
     ".amazonaws.com",
 ]
 
-# Required behind proxy (NGINX on EC2)
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_SSL_REDIRECT = True
+
 
 # =====================
-# CORS / CSRF (FINAL PRODUCTION)
+# CORS / CSRF
 # =====================
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
     "https://ecommerce-django-frontend-lhvj.vercel.app",
+    "https://icecreams.duckdns.org",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://ecommerce-django-frontend-lhvj.vercel.app",
+    "https://icecreams.duckdns.org",
 ]
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 CSRF_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SAMESITE = "None"
 
+
 # =====================
-# LOGGING (CRITICAL FOR PRODUCTION DEBUGGING)
+# LOGGING
 # =====================
 LOGGING = {
     "version": 1,
@@ -74,6 +82,7 @@ LOGGING = {
     },
 }
 
+
 # =====================
 # AUTH
 # =====================
@@ -83,6 +92,7 @@ AUTHENTICATION_BACKENDS = [
     "apps.accounts.backends.EmailBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
+
 
 # =====================
 # APPLICATIONS
@@ -94,9 +104,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
+
     "apps.accounts.apps.AccountsConfig",
     "apps.products.apps.ProductsConfig",
     "apps.wishlist.apps.WishlistConfig",
@@ -105,6 +117,7 @@ INSTALLED_APPS = [
     "apps.orders.apps.OrdersConfig",
     "apps.payments.apps.PaymentsConfig",
 ]
+
 
 # =====================
 # MIDDLEWARE
@@ -119,6 +132,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
 
 # =====================
 # URLS / TEMPLATES
@@ -141,6 +155,7 @@ TEMPLATES = [
     },
 ]
 
+
 # =====================
 # DATABASE
 # =====================
@@ -155,19 +170,21 @@ DATABASES = {
     }
 }
 
+
 # =====================
-# DRF
+# REST FRAMEWORK
 # =====================
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",
+        "rest_framework.permissions.AllowAny",  # Change per-view if needed
     ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
 }
+
 
 # =====================
 # JWT
@@ -182,11 +199,12 @@ SIMPLE_JWT = {
 
 SIMPLE_JWT.update({
     "AUTH_COOKIE": "refresh",
-    "AUTH_COOKIE_SECURE": True,  # 🔥 REQUIRED for HTTPS
+    "AUTH_COOKIE_SECURE": True,
     "AUTH_COOKIE_HTTP_ONLY": True,
     "AUTH_COOKIE_PATH": "/",
-    "AUTH_COOKIE_SAMESITE": "None",  # 🔥 REQUIRED for cross-domain cookies
+    "AUTH_COOKIE_SAMESITE": "None",
 })
+
 
 # =====================
 # STATIC / MEDIA
@@ -196,6 +214,14 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+
+# =====================
+# RAZORPAY
+# =====================
+RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
+RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET")
+
 
 # =====================
 # DEFAULT PK
