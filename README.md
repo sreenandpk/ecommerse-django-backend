@@ -185,3 +185,38 @@ Admin and User logic are separated using dedicated `user_urls` and `admin_urls`.
 ```bash
 git clone https://github.com/sreenandpk/ecommerce-backend.git
 cd ecommerce-backend
+```
+### 2️⃣ Create virtual environment
+```bash
+python -m venv venv
+source venv/bin/activate   # Windows: venv\Scripts\activate
+```
+### 3️⃣ Install dependencies
+```bash
+pip install -r requirements.txt
+```
+### 4️⃣ Configure Environment Variables
+Create a .env file and add:
+```bash
+SECRET_KEY=your_secret_key
+DEBUG=True
+DATABASE_NAME=your_db_name
+DATABASE_USER=your_db_user
+DATABASE_PASSWORD=your_db_password
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+```
+5️⃣ Run migrations
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+6️⃣ Run server
+```bash
+python manage.py runserver
+```
+👨‍💻 Author
+
+Sreenand P K
+Full-Stack Developer
+Django | DRF | PostgreSQL | React | Redux
