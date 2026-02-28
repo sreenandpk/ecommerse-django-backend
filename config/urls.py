@@ -6,7 +6,7 @@ from django.urls import path, include
 urlpatterns = [
     path("admin/", admin.site.urls),
 
-    # ✅ ACCOUNTS (FIXED)
+    #  ACCOUNTS 
     path("api/accounts/", include("apps.accounts.urls")),
 
    # PRODUCTS (USER)
